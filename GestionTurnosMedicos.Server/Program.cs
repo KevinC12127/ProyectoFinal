@@ -1,17 +1,33 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔗 Conexión a SQL Server
+// 🔗 Conexión a PostgreSQL (relacional)
 builder.Services.AddDbContext<TurnosContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+
+// 🔗 Conexión a MongoDB (documental)
+builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoSettings"));
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var settings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
+    return new MongoClient(settings.ConnectionString);
+});
+builder.Services.AddScoped<IMongoTurnoRepository, MongoTurnoRepository>();
+builder.Services.AddScoped<TurnoSyncService>();
 
 // 🔐 CORS para React en localhost:5173
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "https://localhost:5173",
+                "http://localhost:52043",
+                "https://localhost:52043")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials());
