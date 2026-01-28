@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "server: build",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/GestionTurnosMedicos.Server/GestionTurnosMedicos.Server.csproj"
+      ],
+      "problemMatcher": ["$msCompile"],
+      "group": "build"
+    },
+    {
+      "label": "server: watch",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "watch",
+        "run",
+        "--project",
+        "${workspaceFolder}/GestionTurnosMedicos.Server/GestionTurnosMedicos.Server.csproj"
+      ],
+      "isBackground": true,
+      "problemMatcher": ["$msCompile"]
+    },
+    {
+      "label": "client: dev",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "options": {
+        "cwd": "${workspaceFolder}/gestionturnosmedicos.client"
+      },
+      "isBackground": true
+    }
+  ]
+}

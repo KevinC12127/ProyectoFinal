@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Server (.NET)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "server: build",
+      "program": "${workspaceFolder}/GestionTurnosMedicos.Server/bin/Debug/net8.0/GestionTurnosMedicos.Server.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/GestionTurnosMedicos.Server",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Run Full Stack",
+      "configurations": ["Launch Server (.NET)"],
+      "preLaunchTask": "client: dev"
+    }
+  ]
+}
