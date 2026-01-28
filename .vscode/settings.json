@@ -1,0 +1,6 @@
+{
+  "dotnet.defaultSolution": "GestionTurnosMedicos.sln",
+  "terminal.integrated.env.windows": {
+    "PATH": "C:\\Program Files\\dotnet;${env:PATH}"
+  }
+}

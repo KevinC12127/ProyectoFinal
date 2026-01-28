@@ -4,7 +4,7 @@
     {
       "label": "server: build",
       "type": "shell",
-      "command": "dotnet",
+      "command": "C:\\Program Files\\dotnet\\dotnet.exe",
       "args": [
         "build",
         "${workspaceFolder}/GestionTurnosMedicos.Server/GestionTurnosMedicos.Server.csproj"
@@ -15,7 +15,7 @@
     {
       "label": "server: watch",
       "type": "shell",
-      "command": "dotnet",
+      "command": "C:\\Program Files\\dotnet\\dotnet.exe",
       "args": [
         "watch",
         "run",
