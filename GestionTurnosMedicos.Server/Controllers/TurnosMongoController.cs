@@ -37,18 +37,15 @@ public class TurnosMongoController : ControllerBase
         if (turno == null)
             return BadRequest("Datos inválidos.");
 
-        if (string.IsNullOrWhiteSpace(turno.NombrePaciente) ||
-            string.IsNullOrWhiteSpace(turno.Cedula) ||
-            string.IsNullOrWhiteSpace(turno.Especialidad) ||
-            turno.Fecha == default ||
-            string.IsNullOrWhiteSpace(turno.Hora))
+        if (turno.PacienteId <= 0 ||
+            turno.MedicoId <= 0 ||
+            turno.Fecha == default)
         {
-            return BadRequest("Todos los campos son obligatorios.");
+            return BadRequest("pacienteId, medicoId y fecha son obligatorios.");
         }
 
-        turno.SyncKey = TurnoMapper.BuildSyncKey(turno.Cedula, turno.Fecha, turno.Hora, turno.Especialidad);
+        turno.SyncKey = TurnoMapper.BuildSyncKey(turno.PacienteId, turno.MedicoId, turno.Fecha);
         turno.UpdatedAt = DateTime.UtcNow;
-        turno.FechaRegistro = DateTime.UtcNow;
 
         await _mongoRepo.CreateAsync(turno);
         return Ok(turno);
@@ -64,9 +61,8 @@ public class TurnosMongoController : ControllerBase
         if (existing == null) return NotFound();
 
         turno.Id = existing.Id;
-        turno.SyncKey = TurnoMapper.BuildSyncKey(turno.Cedula, turno.Fecha, turno.Hora, turno.Especialidad);
+        turno.SyncKey = TurnoMapper.BuildSyncKey(turno.PacienteId, turno.MedicoId, turno.Fecha);
         turno.UpdatedAt = DateTime.UtcNow;
-        turno.FechaRegistro = existing.FechaRegistro;
 
         await _mongoRepo.UpdateAsync(id, turno);
         return NoContent();

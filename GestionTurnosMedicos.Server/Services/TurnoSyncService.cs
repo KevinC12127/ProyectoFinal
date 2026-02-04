@@ -27,7 +27,7 @@ public class TurnoSyncService
         {
             if (string.IsNullOrWhiteSpace(sql.SyncKey))
             {
-                sql.SyncKey = TurnoMapper.BuildSyncKey(sql.Cedula, sql.Fecha, sql.Hora, sql.Especialidad);
+                sql.SyncKey = TurnoMapper.BuildSyncKey(sql.PacienteId, sql.MedicoId, sql.Fecha);
             }
 
             if (!mongoByKey.TryGetValue(sql.SyncKey, out var mongo))
@@ -37,13 +37,13 @@ public class TurnoSyncService
                 continue;
             }
 
-            if (sql.UpdatedAt >= mongo.UpdatedAt)
+            if (sql.UltimaActualizacion >= mongo.UpdatedAt)
             {
                 var updatedDoc = TurnoMapper.ToDocument(sql);
                 updatedDoc.Id = mongo.Id;
                 await _mongoRepo.UpdateAsync(mongo.Id!, updatedDoc);
                 updated++;
-                if (sql.UpdatedAt != mongo.UpdatedAt) conflicts++;
+                if (sql.UltimaActualizacion != mongo.UpdatedAt) conflicts++;
             }
         }
 
@@ -64,48 +64,68 @@ public class TurnoSyncService
     public async Task<SyncLog> SyncMongoToSqlAsync()
     {
         var mongoTurnos = await _mongoRepo.GetAllAsync();
+        var mongoDetalle = await _mongoRepo.GetAllDetalleAsync();
         var sqlTurnos = await _context.Turnos.ToListAsync();
 
         foreach (var sql in sqlTurnos)
         {
             if (string.IsNullOrWhiteSpace(sql.SyncKey))
             {
-                sql.SyncKey = TurnoMapper.BuildSyncKey(sql.Cedula, sql.Fecha, sql.Hora, sql.Especialidad);
+                sql.SyncKey = TurnoMapper.BuildSyncKey(sql.PacienteId, sql.MedicoId, sql.Fecha);
             }
         }
 
         var sqlByKey = sqlTurnos.ToDictionary(t => t.SyncKey, t => t);
+        var sqlById = sqlTurnos.ToDictionary(t => t.Id, t => t);
 
         int created = 0, updated = 0, conflicts = 0;
+
+        // Sincronización desde detalle_turno (Mongo) hacia SQL por TurnoId
+        foreach (var detalle in mongoDetalle)
+        {
+            if (!sqlById.TryGetValue(detalle.TurnoId, out var sql))
+            {
+                continue;
+            }
+
+            if (detalle.UltimaActualizacion >= sql.UltimaActualizacion)
+            {
+                sql.Estado = detalle.Estado;
+                if (detalle.UltimaActualizacion != sql.UltimaActualizacion)
+                {
+                    conflicts++;
+                }
+                sql.UltimaActualizacion = detalle.UltimaActualizacion;
+                updated++;
+            }
+        }
 
         foreach (var mongo in mongoTurnos)
         {
             if (string.IsNullOrWhiteSpace(mongo.SyncKey))
             {
-                mongo.SyncKey = TurnoMapper.BuildSyncKey(mongo.Cedula, mongo.Fecha, mongo.Hora, mongo.Especialidad);
+                mongo.SyncKey = TurnoMapper.BuildSyncKey(mongo.PacienteId, mongo.MedicoId, mongo.Fecha);
             }
 
             if (!sqlByKey.TryGetValue(mongo.SyncKey, out var sql))
             {
                 var entity = TurnoMapper.ToEntity(mongo);
-                entity.FechaRegistro = mongo.FechaRegistro;
                 entity.UpdatedAt = mongo.UpdatedAt;
                 _context.Turnos.Add(entity);
                 created++;
                 continue;
             }
 
-            if (mongo.UpdatedAt >= sql.UpdatedAt)
+            if (mongo.UpdatedAt >= sql.UltimaActualizacion)
             {
-                sql.NombrePaciente = mongo.NombrePaciente;
-                sql.Cedula = mongo.Cedula;
-                sql.Especialidad = mongo.Especialidad;
+                sql.PacienteId = mongo.PacienteId;
+                sql.MedicoId = mongo.MedicoId;
                 sql.Fecha = mongo.Fecha;
                 sql.Hora = mongo.Hora;
-                sql.FechaRegistro = mongo.FechaRegistro;
-                sql.UpdatedAt = mongo.UpdatedAt;
+                sql.Estado = mongo.Estado;
+                sql.UltimaActualizacion = mongo.UpdatedAt;
                 updated++;
-                if (mongo.UpdatedAt != sql.UpdatedAt) conflicts++;
+                if (mongo.UpdatedAt != sql.UltimaActualizacion) conflicts++;
             }
         }
 
@@ -132,7 +152,7 @@ public class TurnoSyncService
         {
             if (string.IsNullOrWhiteSpace(sql.SyncKey))
             {
-                sql.SyncKey = TurnoMapper.BuildSyncKey(sql.Cedula, sql.Fecha, sql.Hora, sql.Especialidad);
+                sql.SyncKey = TurnoMapper.BuildSyncKey(sql.PacienteId, sql.MedicoId, sql.Fecha);
             }
         }
 
@@ -140,7 +160,7 @@ public class TurnoSyncService
         {
             if (string.IsNullOrWhiteSpace(mongo.SyncKey))
             {
-                mongo.SyncKey = TurnoMapper.BuildSyncKey(mongo.Cedula, mongo.Fecha, mongo.Hora, mongo.Especialidad);
+                mongo.SyncKey = TurnoMapper.BuildSyncKey(mongo.PacienteId, mongo.MedicoId, mongo.Fecha);
             }
         }
 
@@ -153,7 +173,7 @@ public class TurnoSyncService
         {
             if (string.IsNullOrWhiteSpace(sql.SyncKey))
             {
-                sql.SyncKey = TurnoMapper.BuildSyncKey(sql.Cedula, sql.Fecha, sql.Hora, sql.Especialidad);
+                sql.SyncKey = TurnoMapper.BuildSyncKey(sql.PacienteId, sql.MedicoId, sql.Fecha);
             }
 
             if (!mongoByKey.TryGetValue(sql.SyncKey, out var mongo))
@@ -163,7 +183,7 @@ public class TurnoSyncService
                 continue;
             }
 
-            if (sql.UpdatedAt > mongo.UpdatedAt)
+            if (sql.UltimaActualizacion > mongo.UpdatedAt)
             {
                 var updatedDoc = TurnoMapper.ToDocument(sql);
                 updatedDoc.Id = mongo.Id;
@@ -177,7 +197,7 @@ public class TurnoSyncService
         {
             if (string.IsNullOrWhiteSpace(mongo.SyncKey))
             {
-                mongo.SyncKey = TurnoMapper.BuildSyncKey(mongo.Cedula, mongo.Fecha, mongo.Hora, mongo.Especialidad);
+                mongo.SyncKey = TurnoMapper.BuildSyncKey(mongo.PacienteId, mongo.MedicoId, mongo.Fecha);
             }
 
             if (!sqlByKey.TryGetValue(mongo.SyncKey, out var sql))
@@ -187,15 +207,14 @@ public class TurnoSyncService
                 continue;
             }
 
-            if (mongo.UpdatedAt > sql.UpdatedAt)
+            if (mongo.UpdatedAt > sql.UltimaActualizacion)
             {
-                sql.NombrePaciente = mongo.NombrePaciente;
-                sql.Cedula = mongo.Cedula;
-                sql.Especialidad = mongo.Especialidad;
+                sql.PacienteId = mongo.PacienteId;
+                sql.MedicoId = mongo.MedicoId;
                 sql.Fecha = mongo.Fecha;
                 sql.Hora = mongo.Hora;
-                sql.FechaRegistro = mongo.FechaRegistro;
-                sql.UpdatedAt = mongo.UpdatedAt;
+                sql.Estado = mongo.Estado;
+                sql.UltimaActualizacion = mongo.UpdatedAt;
                 updated++;
                 conflicts++;
             }

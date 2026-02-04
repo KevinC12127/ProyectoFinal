@@ -8,13 +8,12 @@ public static class TurnoMapper
         return new TurnoDocument
         {
             SyncKey = entity.SyncKey,
-            NombrePaciente = entity.NombrePaciente,
-            Cedula = entity.Cedula,
-            Especialidad = entity.Especialidad,
+            PacienteId = entity.PacienteId,
+            MedicoId = entity.MedicoId,
             Fecha = entity.Fecha,
             Hora = entity.Hora,
-            FechaRegistro = entity.FechaRegistro,
-            UpdatedAt = entity.UpdatedAt
+            Estado = entity.Estado,
+            UpdatedAt = entity.UltimaActualizacion
         };
     }
 
@@ -24,18 +23,17 @@ public static class TurnoMapper
         return new Turno
         {
             SyncKey = doc.SyncKey,
-            NombrePaciente = doc.NombrePaciente,
-            Cedula = doc.Cedula,
-            Especialidad = doc.Especialidad,
+            PacienteId = doc.PacienteId,
+            MedicoId = doc.MedicoId,
             Fecha = doc.Fecha,
             Hora = doc.Hora,
-            FechaRegistro = doc.FechaRegistro,
+            Estado = doc.Estado,
+            UltimaActualizacion = doc.UpdatedAt,
             UpdatedAt = doc.UpdatedAt
         };
     }
 
-    public static string BuildSyncKey(string cedula, DateTime fecha, string hora, string especialidad)
+    public static string BuildSyncKey(int pacienteId, int medicoId, DateTime fecha)
     {
-        return $"{cedula}|{fecha:yyyy-MM-dd}|{hora}|{especialidad}";
-    }
+        return $"{pacienteId}|{medicoId}|{fecha:yyyy-MM-dd}";    }
 }

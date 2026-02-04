@@ -39,19 +39,16 @@ public class TurnosController : ControllerBase
             return BadRequest("Datos inválidos.");
 
         // Validaciones de campos obligatorios
-        if (string.IsNullOrWhiteSpace(turno.NombrePaciente) ||
-            string.IsNullOrWhiteSpace(turno.Cedula) ||
-            string.IsNullOrWhiteSpace(turno.Especialidad) ||
-            turno.Fecha == default ||
-            string.IsNullOrWhiteSpace(turno.Hora))
+        if (turno.PacienteId <= 0 ||
+            turno.MedicoId <= 0 ||
+            turno.Fecha == default)
         {
-            return BadRequest("Todos los campos son obligatorios.");
+            return BadRequest("pacienteId, medicoId y fecha son obligatorios.");
         }
 
-        // Asignar fecha de registro si no viene desde el frontend
-        turno.FechaRegistro = DateTime.Now;
+        // Asignar valores por defecto
         turno.UpdatedAt = DateTime.UtcNow;
-        turno.SyncKey = TurnoMapper.BuildSyncKey(turno.Cedula, turno.Fecha, turno.Hora, turno.Especialidad);
+        turno.SyncKey = TurnoMapper.BuildSyncKey(turno.PacienteId, turno.MedicoId, turno.Fecha);
 
         // Guardar en base de datos
         _context.Turnos.Add(turno);
@@ -71,12 +68,12 @@ public class TurnosController : ControllerBase
         var existing = await _context.Turnos.FindAsync(id);
         if (existing == null) return NotFound();
 
-        existing.NombrePaciente = turno.NombrePaciente;
-        existing.Cedula = turno.Cedula;
-        existing.Especialidad = turno.Especialidad;
+        existing.PacienteId = turno.PacienteId;
+        existing.MedicoId = turno.MedicoId;
         existing.Fecha = turno.Fecha;
         existing.Hora = turno.Hora;
-        existing.SyncKey = TurnoMapper.BuildSyncKey(turno.Cedula, turno.Fecha, turno.Hora, turno.Especialidad);
+        existing.Estado = turno.Estado;
+        existing.SyncKey = TurnoMapper.BuildSyncKey(turno.PacienteId, turno.MedicoId, turno.Fecha);
         existing.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();

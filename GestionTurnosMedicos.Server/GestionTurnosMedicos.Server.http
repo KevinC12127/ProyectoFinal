@@ -1,6 +1,88 @@
 @GestionTurnosMedicos.Server_HostAddress = http://localhost:5252
 
-GET {{GestionTurnosMedicos.Server_HostAddress}}/weatherforecast/
+### ========== PACIENTES ==========
+
+### Obtener todos los pacientes
+GET {{GestionTurnosMedicos.Server_HostAddress}}/api/pacientes
 Accept: application/json
+
+###
+
+### Crear un paciente
+POST {{GestionTurnosMedicos.Server_HostAddress}}/api/pacientes
+Content-Type: application/json
+
+{
+  "nombre": "Juan Pérez",
+  "cedula": "1234567890",
+  "telefono": "555-0123"
+}
+
+###
+
+### ========== MEDICOS ==========
+
+### Obtener todos los médicos
+GET {{GestionTurnosMedicos.Server_HostAddress}}/api/medicos
+Accept: application/json
+
+###
+
+### Crear un médico
+POST {{GestionTurnosMedicos.Server_HostAddress}}/api/medicos
+Content-Type: application/json
+
+{
+  "nombre": "Dr. García",
+  "especialidad": "Cardiología"
+}
+
+###
+
+### ========== TURNOS ==========
+
+### Obtener todos los turnos
+GET {{GestionTurnosMedicos.Server_HostAddress}}/api/turnos
+Accept: application/json
+
+###
+
+### Crear un turno de prueba
+POST {{GestionTurnosMedicos.Server_HostAddress}}/api/turnos
+Content-Type: application/json
+
+{
+  "pacienteId": 1,
+  "medicoId": 1,
+  "fecha": "2026-02-05T00:00:00",
+  "hora": "10:00:00",
+  "estado": "pendiente"
+}
+
+###
+
+### ========== SINCRONIZACIÓN ==========
+
+### Sincronizar SQL a Mongo
+POST {{GestionTurnosMedicos.Server_HostAddress}}/api/sync/sql-to-mongo
+Content-Type: application/json
+
+###
+
+### Obtener logs de sincronización
+GET {{GestionTurnosMedicos.Server_HostAddress}}/api/sync/logs
+Accept: application/json
+
+###
+
+### Sincronizar Mongo a SQL
+POST {{GestionTurnosMedicos.Server_HostAddress}}/api/sync/mongo-to-sql
+Content-Type: application/json
+
+###
+
+### Sincronización bidireccional
+POST {{GestionTurnosMedicos.Server_HostAddress}}/api/sync/bidirectional
+Content-Type: application/json
 
 ###

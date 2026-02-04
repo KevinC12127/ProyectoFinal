@@ -9,11 +9,10 @@ public class TurnoDocument
     public string? Id { get; set; }
 
     public string SyncKey { get; set; } = string.Empty;
-    public string NombrePaciente { get; set; } = string.Empty;
-    public string Cedula { get; set; } = string.Empty;
-    public string Especialidad { get; set; } = string.Empty;
+    public int PacienteId { get; set; }
+    public int MedicoId { get; set; }
     public DateTime Fecha { get; set; }
-    public string Hora { get; set; } = string.Empty;
-    public DateTime FechaRegistro { get; set; } = DateTime.UtcNow;
+    public TimeSpan Hora { get; set; } = TimeSpan.Zero;
+    public string Estado { get; set; } = "pendiente";    
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }
