@@ -9,4 +9,5 @@ public interface IMongoTurnoRepository
     Task CreateAsync(TurnoDocument turno);
     Task UpdateAsync(string id, TurnoDocument turno);
     Task DeleteAsync(string id);
+    Task<List<DetalleTurno>> GetAllDetalleAsync();
 }

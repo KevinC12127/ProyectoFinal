@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 public class MongoTurnoRepository : IMongoTurnoRepository
 {
     private readonly IMongoCollection<TurnoDocument> _collection;
+    private readonly IMongoCollection<DetalleTurno> _detalleCollection;
 
     public MongoTurnoRepository(IMongoClient client, IOptions<MongoSettings> settings)
     {
         var database = client.GetDatabase(settings.Value.Database);
         _collection = database.GetCollection<TurnoDocument>(settings.Value.TurnosCollection);
+        _detalleCollection = database.GetCollection<DetalleTurno>("detalle_turno");
     }
 
     public async Task<List<TurnoDocument>> GetAllAsync() =>
@@ -30,4 +32,8 @@ public class MongoTurnoRepository : IMongoTurnoRepository
 
     public async Task DeleteAsync(string id) =>
         await _collection.DeleteOneAsync(x => x.Id == id);
+
+    // Nuevo método para DetalleTurno
+    public async Task<List<DetalleTurno>> GetAllDetalleAsync() =>
+        await _detalleCollection.Find(_ => true).ToListAsync();
 }

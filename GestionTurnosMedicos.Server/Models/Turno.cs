@@ -28,6 +28,12 @@ public class Turno
     [JsonPropertyName("fechaRegistro")]
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
 
+    [JsonPropertyName("estado")]
+    public string Estado { get; set; } = "pendiente";
+
+    [JsonPropertyName("ultimaActualizacion")]
+    public DateTime UltimaActualizacion { get; set; } = DateTime.UtcNow;
+
     [JsonPropertyName("syncKey")]
     public string SyncKey { get; set; } = string.Empty;
 
